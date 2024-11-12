@@ -13,7 +13,7 @@ public class CameraControl : MonoBehaviour
     private float _cameraLimit;     // 카메라 최대 이동 범위 제한(5f)
 
     // 카메라 이동 관련 변수
-    private int curCamera = 0;
+    public int curCamera = 0;
 
     // 필요 컴포넌트
     [SerializeField]
