@@ -21,6 +21,7 @@ public class GameManagerLogic : MonoBehaviour
     //     playerCountText.text = count.ToString();
     // }
 
+    // TODO : 블럭이 필드 밖으로 떨어졌을 때, 게임 종료 판정 추가
     void OnTriggerEnter(Collider other)
     {
         // 박스가 떨어져 밖으로 나갔을 경우 이벤트 처리

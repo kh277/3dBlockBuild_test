@@ -11,6 +11,8 @@ public class CameraControl : MonoBehaviour
     // 카메라 이동 범위 제한 처리
     [SerializeField]
     private float _cameraLimit;     // 카메라 최대 이동 범위 제한(5f)
+    private float _cameraScaleMin = 8.5f;       // 카메라 확대 범위 제한
+    private float _cameraScaleMax = 15f;        // 카메라 축소 범위 제한
 
     // 게임 시작 시 enable 할 카메라 
     [SerializeField]
@@ -31,13 +33,8 @@ public class CameraControl : MonoBehaviour
     
     void Start()
     {
-        // 시작 시 카메라를 startCamera로 설정
         cameraType = new Camera[] {xCamera, yCamera, zCamera};
-        cameraType[(startCamera+1)%3].enabled = false;
-        cameraType[(startCamera+2)%3].enabled = false;
-        cameraType[startCamera].enabled = true;
-        curCamera = startCamera;
-        Debug.Log(curCamera);
+        initCamera();
     }
 
     void Update()
@@ -52,12 +49,20 @@ public class CameraControl : MonoBehaviour
         CameraMove();
     }
 
+    // 시작 시 카메라를 startCamera로 설정
+    private void initCamera()
+    {
+        cameraType[(startCamera+1)%3].enabled = false;
+        cameraType[(startCamera+2)%3].enabled = false;
+        cameraType[startCamera].enabled = true;
+        curCamera = startCamera;
+    }
+
     // x, y, z 방향 카메라 전환 함수
     private void ChangeCamera()
     {
         cameraType[(curCamera+2)%3].enabled = false;
         cameraType[curCamera].enabled = true;
-        Debug.Log(curCamera);
 
         // Audio Listener 컴포넌트를 카메라에서 삭제하여 처리함. 필요하면 추가할 것.
         // foreach (var cam in cameraType)
@@ -73,8 +78,6 @@ public class CameraControl : MonoBehaviour
     // 카메라 이동 처리 함수
     private void CameraMove()
     {
-        Vector3 p_Velocity = new Vector3();
-
         // 활성화된 카메라 별 카메라 이동 처리
         if (curCamera == 0)         // x축 카메라
             CameraMoveX();
@@ -84,7 +87,7 @@ public class CameraControl : MonoBehaviour
             CameraMoveZ();
     }
 
-    // x방향 카메라 이동
+    // x카메라 이동
     private void CameraMoveX()
     {
         Vector3 p_Velocity = new Vector3();
@@ -97,6 +100,10 @@ public class CameraControl : MonoBehaviour
             p_Velocity += new Vector3(0, 0, -1f);
         if (Input.GetKey(KeyCode.D))
             p_Velocity += new Vector3(0, 0, 1f);
+        if (Input.GetAxis("Mouse ScrollWheel") > 0f)
+            p_Velocity += new Vector3(-1f, 0, 0);
+        if (Input.GetAxis("Mouse ScrollWheel") < 0f)
+            p_Velocity += new Vector3(1f, 0, 0);
         
         // p_Velocity가 0이 아닐 경우에만 이동 수행
         if (p_Velocity.sqrMagnitude > 0)
@@ -109,12 +116,15 @@ public class CameraControl : MonoBehaviour
             float newY = Mathf.Clamp(curCameraPos.y + movement.y, 0.5f, _cameraLimit);
             float newZ = Mathf.Clamp(curCameraPos.z + movement.z, -_cameraLimit, _cameraLimit);
 
+            // 마우스 휠에 따라 카메라 확대-축소 처리, 1배율로 하면 너무 느려서 *3를 해줌.
+            float newX = Mathf.Clamp(curCameraPos.x + movement.x*3, _cameraScaleMin, _cameraScaleMax);
+
             // 제한된 위치로 카메라 이동
-            cameraType[curCamera].transform.position = new Vector3(curCameraPos.x, newY, newZ);
+            cameraType[curCamera].transform.position = new Vector3(newX, newY, newZ);
         }
     }
 
-    // y방향 카메라 이동
+    // y카메라 이동
     private void CameraMoveY()
     {
         Vector3 p_Velocity = new Vector3();
@@ -126,6 +136,10 @@ public class CameraControl : MonoBehaviour
             p_Velocity += new Vector3(-1f, 0, 0);
         if (Input.GetKey(KeyCode.D))
             p_Velocity += new Vector3(1f, 0, 0);
+        if (Input.GetAxis("Mouse ScrollWheel") > 0f)
+            p_Velocity += new Vector3(0, -1f, 0);
+        if (Input.GetAxis("Mouse ScrollWheel") < 0f)
+            p_Velocity += new Vector3(0, 1f, 0);
         
         // p_Velocity가 0이 아닐 경우에만 이동 수행
         if (p_Velocity.sqrMagnitude > 0)
@@ -138,12 +152,15 @@ public class CameraControl : MonoBehaviour
             float newX = Mathf.Clamp(curCameraPos.x + movement.x, -_cameraLimit, _cameraLimit);
             float newZ = Mathf.Clamp(curCameraPos.z + movement.z, -_cameraLimit, _cameraLimit);
 
+            // 마우스 휠에 따라 카메라 확대-축소 처리, 1배율로 하면 너무 느려서 *3를 해줌.
+            float newY = Mathf.Clamp(curCameraPos.y + movement.y*3, _cameraScaleMin, _cameraScaleMax);
+
             // 제한된 위치로 카메라 이동
-            cameraType[curCamera].transform.position = new Vector3(newX, curCameraPos.y, newZ);
+            cameraType[curCamera].transform.position = new Vector3(newX, newY, newZ);
         }
     }
 
-    // xyz방향 카메라 이동
+    // z카메라 이동
     private void CameraMoveZ()
     {
         Vector3 p_Velocity = new Vector3();
@@ -156,6 +173,10 @@ public class CameraControl : MonoBehaviour
             p_Velocity += new Vector3(1f, 0, 0);
         if (Input.GetKey(KeyCode.D))
             p_Velocity += new Vector3(-1f, 0, 0);
+        if (Input.GetAxis("Mouse ScrollWheel") > 0f)
+            p_Velocity += new Vector3(0, 0, -1f);
+        if (Input.GetAxis("Mouse ScrollWheel") < 0f)
+            p_Velocity += new Vector3(0, 0, 1f);
         
         // p_Velocity가 0이 아닐 경우에만 이동 수행
         if (p_Velocity.sqrMagnitude > 0)
@@ -168,8 +189,11 @@ public class CameraControl : MonoBehaviour
             float newX = Mathf.Clamp(curCameraPos.x + movement.x, -_cameraLimit, _cameraLimit);
             float newY = Mathf.Clamp(curCameraPos.y + movement.y, 0.5f, _cameraLimit);
 
+            // 마우스 휠에 따라 카메라 확대-축소 처리, 1배율로 하면 너무 느려서 *3를 해줌.
+            float newZ = Mathf.Clamp(curCameraPos.z + movement.z*3, _cameraScaleMin, _cameraScaleMax);
+
             // 제한된 위치로 카메라 이동
-            cameraType[curCamera].transform.position = new Vector3(newX, newY, curCameraPos.z);
+            cameraType[curCamera].transform.position = new Vector3(newX, newY, newZ);
         }
     }
 }

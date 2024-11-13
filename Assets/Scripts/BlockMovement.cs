@@ -17,9 +17,11 @@ public class BlockMovement : MonoBehaviour
         }
     }
 
+    // TODO: 블럭을 이동시켰을 때, 필드 범위를 벗어나지 못하도록 방지하는 코드 추가 필요.
     private void Update()
     {
-        if (cameraControl == null) return; // cameraControl이 null이면 작업 x
+        // cameraControl이 null이면 작업 x
+        if (cameraControl == null) return;
 
         Vector3 movement = Vector3.zero;
 
