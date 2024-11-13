@@ -755,7 +755,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraSpeed: 7
   _cameraLimit: 5
-  curCamera: 0
+  startCamera: 0
+  curCamera: 1
   xCamera: {fileID: 1408237281}
   yCamera: {fileID: 1479989171}
   zCamera: {fileID: 1374922381}

@@ -12,8 +12,12 @@ public class CameraControl : MonoBehaviour
     [SerializeField]
     private float _cameraLimit;     // 카메라 최대 이동 범위 제한(5f)
 
+    // 게임 시작 시 enable 할 카메라 
+    [SerializeField]
+    private int startCamera = 0;
+
     // 카메라 이동 관련 변수
-    public int curCamera = 0;
+    public int curCamera;
 
     // 필요 컴포넌트
     [SerializeField]
@@ -27,7 +31,13 @@ public class CameraControl : MonoBehaviour
     
     void Start()
     {
+        // 시작 시 카메라를 startCamera로 설정
         cameraType = new Camera[] {xCamera, yCamera, zCamera};
+        cameraType[(startCamera+1)%3].enabled = false;
+        cameraType[(startCamera+2)%3].enabled = false;
+        cameraType[startCamera].enabled = true;
+        curCamera = startCamera;
+        Debug.Log(curCamera);
     }
 
     void Update()
@@ -47,6 +57,7 @@ public class CameraControl : MonoBehaviour
     {
         cameraType[(curCamera+2)%3].enabled = false;
         cameraType[curCamera].enabled = true;
+        Debug.Log(curCamera);
 
         // Audio Listener 컴포넌트를 카메라에서 삭제하여 처리함. 필요하면 추가할 것.
         // foreach (var cam in cameraType)
